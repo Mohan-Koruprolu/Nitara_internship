@@ -18,10 +18,6 @@ class Myapp extends StatelessWidget {
             child: Container(
               child: Pageinfo(),
               decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: NetworkImage(
-                          'https://wallpapercave.com/wp/wp8665558.jpg'),
-                      fit: BoxFit.cover),
                   borderRadius: BorderRadius.all(Radius.circular(20))),
             ),
           ),

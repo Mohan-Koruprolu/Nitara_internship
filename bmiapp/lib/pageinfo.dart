@@ -39,8 +39,13 @@ class PageinfoState extends State {
                 decoration: InputDecoration(hintText: "Enter Weight in kg"),
                 onChanged: (value) {
                   setState(() {
-                    weight = double.parse(value);
-                    bmi = weight / pow(height / 100, 2);
+                    if (value != '') {
+                      weight = double.parse(value);
+                      bmi = weight / pow(height / 100, 2);
+                    } else {
+                      weight = 1.0;
+                      bmi = 1.0;
+                    }
                     bmiupdate();
                   });
                 },
@@ -53,8 +58,13 @@ class PageinfoState extends State {
               decoration: InputDecoration(hintText: "Enter height in Meters"),
               onChanged: (value) {
                 setState(() {
-                  height = double.parse(value);
-                  bmi = weight / pow(height / 100, 2);
+                  if (value != '') {
+                    height = double.parse(value);
+                    bmi = weight / pow(height / 100, 2);
+                  } else {
+                    height = 1.0;
+                    bmi = 1.0;
+                  }
                   bmiupdate();
                 });
               },
