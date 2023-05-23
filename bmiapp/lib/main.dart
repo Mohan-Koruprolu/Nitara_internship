@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'pageinfo.dart';
 
 void main(List<String> args) {
-  runApp(Myapp());
+  runApp(const Myapp());
 }
 
 class Myapp extends StatelessWidget {
@@ -14,11 +14,11 @@ class Myapp extends StatelessWidget {
       home: Scaffold(
         body: Center(
           child: Padding(
-            padding: EdgeInsets.all(80),
+            padding: const EdgeInsets.all(80),
             child: Container(
-              child: Pageinfo(),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(20))),
+              child: const Pageinfo(),
             ),
           ),
         ),

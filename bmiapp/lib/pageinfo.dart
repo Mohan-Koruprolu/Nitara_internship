@@ -29,56 +29,50 @@ class PageinfoState extends State {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Expanded(
-            child: Container(
-              child: TextField(
-                decoration: InputDecoration(hintText: "Enter Weight in kg"),
-                onChanged: (value) {
-                  setState(() {
-                    if (value != '') {
-                      weight = double.parse(value);
-                      bmi = weight / pow(height / 100, 2);
-                    } else {
-                      weight = 1.0;
-                      bmi = 1.0;
-                    }
-                    bmiupdate();
-                  });
-                },
-              ),
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          child: TextField(
+            decoration: const InputDecoration(hintText: "Enter Weight in kg"),
+            onChanged: (value) {
+              setState(() {
+                if (value != '') {
+                  weight = double.parse(value);
+                  bmi = weight / pow(height / 100, 2);
+                } else {
+                  weight = 1.0;
+                  bmi = 1.0;
+                }
+                bmiupdate();
+              });
+            },
           ),
-          Expanded(
-              child: Container(
+        ),
+        Expanded(
             child: TextField(
-              decoration: InputDecoration(hintText: "Enter height in Meters"),
-              onChanged: (value) {
-                setState(() {
-                  if (value != '') {
-                    height = double.parse(value);
-                    bmi = weight / pow(height / 100, 2);
-                  } else {
-                    height = 1.0;
-                    bmi = 1.0;
-                  }
-                  bmiupdate();
-                });
-              },
-            ),
-          )),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              child: Image.network(img[level]),
-            ),
+          decoration: const InputDecoration(hintText: "Enter height in Meters"),
+          onChanged: (value) {
+            setState(() {
+              if (value != '') {
+                height = double.parse(value);
+                bmi = weight / pow(height / 100, 2);
+              } else {
+                height = 1.0;
+                bmi = 1.0;
+              }
+              bmiupdate();
+            });
+          },
+        )),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            child: Image.network(img[level]),
           ),
-          Container(child: Text("BMI vlaue being $bmi"))
-        ],
-      ),
+        ),
+        Text("BMI vlaue being $bmi")
+      ],
     );
   }
 }
