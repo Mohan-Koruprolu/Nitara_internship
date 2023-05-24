@@ -17,7 +17,7 @@ class PageinfoState extends State {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.max,
+      // mainAxisSize: MainAxisSize.max,
       children: [
         Expanded(
           flex: 2,
