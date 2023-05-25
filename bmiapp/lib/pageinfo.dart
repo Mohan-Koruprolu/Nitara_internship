@@ -39,10 +39,10 @@ class PageinfoState extends State {
             onPressed: () {
               valchange(_heightvalues, _weightvalues);
             },
-            child: Text("Submit the values"),
+            child: const Text("Submit the values"),
           ),
         )),
-        Expanded(
+        const Expanded(
             flex: 1,
             child: SizedBox(
               height: 20,
@@ -55,7 +55,7 @@ class PageinfoState extends State {
                 "https://th.bing.com/th/id/OIP.XJOSqzpR817O9ZPXqgtt2gHafl?w=82&h=349&c=7&r=0&o=5&dpr=1.3&pid=1.7"),
           ),
         ),
-        Expanded(flex: 2, child: Text("BMI vlaue being ${_bmi}"))
+        Expanded(flex: 2, child: Text("BMI vlaue being $_bmi"))
       ],
     );
   }
