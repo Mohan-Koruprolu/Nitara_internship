@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+typedef Commonstring = void Function(String val);
+
 class Calculatorpage extends StatelessWidget {
+  Commonaccess x = Commonaccess();
   @override
   Widget build(BuildContext context) {
+    int b = x.val;
     return Container(
       child: Column(
         children: [
@@ -41,6 +45,9 @@ class Calculatorpage extends StatelessWidget {
                 ),
                 calcoperand(
                   operand: 'Clear',
+                ),
+                calcoperand(
+                  operand: 'Del',
                 ),
               ],
             ),
@@ -93,9 +100,22 @@ class Rowwiseelements extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          calcbutton(number: leftvalue),
-          calcbutton(number: midvalue),
-          calcbutton(number: rightvalue),
+          calcbutton(
+            number: leftvalue,
+            callbackFn: (val) {
+              print(val + "inside row widget");
+            },
+          ),
+          calcbutton(
+              number: midvalue,
+              callbackFn: (val) {
+                print(val + "inside row widget");
+              }),
+          calcbutton(
+              number: rightvalue,
+              callbackFn: (val) {
+                print(val + "inside row widget");
+              }),
         ],
       ),
     );
@@ -105,7 +125,9 @@ class Rowwiseelements extends StatelessWidget {
 class calcbutton extends StatefulWidget {
   int? value;
   String? val = '';
-  calcbutton({Key? key, @required int? number}) : super(key: key) {
+  Commonstring callbackFn;
+  calcbutton({Key? key, @required int? number, required this.callbackFn})
+      : super(key: key) {
     value = number;
   }
 
@@ -128,6 +150,7 @@ class _calcbuttonState extends State<calcbutton> {
             side: BorderSide(color: Colors.black, width: 3),
             shadowColor: Colors.grey),
         onPressed: () {
+          widget.callbackFn.call(widget.value.toString());
           setState(() {
             print(widget.value);
           });
@@ -137,5 +160,15 @@ class _calcbuttonState extends State<calcbutton> {
         ),
       ),
     ));
+  }
+}
+
+class Commonaccess {
+  List<int> a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  int val = 0;
+
+  Commonaccess();
+  int onvalchange(input) {
+    return val = a[input];
   }
 }
