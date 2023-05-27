@@ -1,7 +1,17 @@
-void main(List<String> args) {
-  int a = 0;
-  int b = 1;
-  print((b / a ).runtimeType);
-  RegExp acceptedvalue = RegExp(r'\d+[+-*/]\d+[123456789]+d*');
-  
+import 'package:math_expressions/math_expressions.dart';
+
+class Sample {
+  String parseinput(String input) {
+    RegExp expression =
+        RegExp(r'^[+-]?[0-9]+(\.[0-9]+)?([+\-*/]{1}[+-]?[0-9]+(\.[0-9]+)?)*$');
+    if (expression.hasMatch(input)) {
+      Parser p = Parser();
+      Expression exp = p.parse(input);
+      ContextModel cm = ContextModel();
+      double eval = exp.evaluate(EvaluationType.REAL, cm);
+      return eval.toString();
+    } else {
+      return "ERROR";
+    }
+  }
 }

@@ -1,9 +1,11 @@
+import 'package:calculator/logic.dart';
 import 'package:flutter/material.dart';
-
 void main(List<String> args) {
+  //entry point
   runApp(const SampleApp());
 }
 
+///normal body implementation
 class SampleApp extends StatefulWidget {
   const SampleApp({super.key});
 
@@ -18,29 +20,37 @@ class _SampleAppState extends State<SampleApp> {
       setState(() {
         if (value.length > 1) {
           value = value.substring(0, value.length - 1);
-          print(value);
         } else {
-          print(value);
           value = '';
         }
       });
     };
   }
 
-  Function clearval(String val) {
+  /// call this [output] funtion to evaluate the expression present in the [ value ] by calling a [Sample] object
+  Function output(String val) {
     return (val) {
       setState(() {
-        value = '';
-        print(value);
+        Sample a = Sample();
+        value = a.parseinput(value);
       });
     };
   }
 
+  /// clearing the expression present in the [value]
+  Function clearval(String val) {
+    return (val) {
+      setState(() {
+        value = '';
+      });
+    };
+  }
+
+  /// adding the [val] of the button to the already present [value]
   Function changeval(String val) {
     return (String val) {
       setState(() {
         value = value + val;
-        print(value);
       });
     };
   }
@@ -53,7 +63,8 @@ class _SampleAppState extends State<SampleApp> {
           title: const Text("Grid Trails"),
         ),
         body: Container(
-          decoration: BoxDecoration(),
+          decoration:
+              const BoxDecoration(color: Color.fromARGB(255, 0, 118, 181)),
           child: Column(
             // using Expanded Widgets inside cloumn to make the layout
             children: [
@@ -67,7 +78,7 @@ class _SampleAppState extends State<SampleApp> {
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[400],
+                          color: const Color.fromARGB(255, 0, 0, 0),
                           border:
                               Border.all(width: 5, style: BorderStyle.solid),
                           borderRadius: BorderRadius.circular(20),
@@ -81,6 +92,7 @@ class _SampleAppState extends State<SampleApp> {
                         child: Text(
                           value,
                           style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 90,
                             letterSpacing: 20,
                           ),
@@ -93,7 +105,7 @@ class _SampleAppState extends State<SampleApp> {
               Expanded(
                 flex: 2,
 
-                ///'https://stackoverflow.com/questions/44183795/how-to-create-gridview-layout-in-flutter' col and row is best for fixed layout rather than grid
+                //'https://stackoverflow.com/questions/44183795/how-to-create-gridview-layout-in-flutter' col and row is best for fixed layout rather than grid
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(children: [
@@ -102,20 +114,20 @@ class _SampleAppState extends State<SampleApp> {
                         children: [
                           CalcNumButton(
                             val: "1",
-                            changeval: changeval("1"),
+                            function: changeval("1"),
                           ),
                           CalcNumButton(
                             val: "2",
-                            changeval: changeval("2"),
+                            function: changeval("2"),
                           ),
                           CalcNumButton(
                             val: "3",
-                            changeval: changeval("3"),
+                            function: changeval("3"),
                           ),
                           CalcNumButton(
                             val: "+",
                             customcol: Colors.blue,
-                            changeval: changeval('+'),
+                            function: changeval('+'),
                           ),
                         ],
                       ),
@@ -125,20 +137,20 @@ class _SampleAppState extends State<SampleApp> {
                         children: [
                           CalcNumButton(
                             val: "4",
-                            changeval: changeval("4"),
+                            function: changeval("4"),
                           ),
                           CalcNumButton(
                             val: "5",
-                            changeval: changeval("5"),
+                            function: changeval("5"),
                           ),
                           CalcNumButton(
                             val: "6",
-                            changeval: changeval("6"),
+                            function: changeval("6"),
                           ),
                           CalcNumButton(
                             val: "-",
                             customcol: Colors.green,
-                            changeval: changeval('-'),
+                            function: changeval('-'),
                           ),
                         ],
                       ),
@@ -148,20 +160,20 @@ class _SampleAppState extends State<SampleApp> {
                         children: [
                           CalcNumButton(
                             val: "7",
-                            changeval: changeval("7"),
+                            function: changeval("7"),
                           ),
                           CalcNumButton(
                             val: "8",
-                            changeval: changeval("8"),
+                            function: changeval("8"),
                           ),
                           CalcNumButton(
                             val: "9",
-                            changeval: changeval("9"),
+                            function: changeval("9"),
                           ),
                           CalcNumButton(
                             val: "*",
                             customcol: Colors.grey,
-                            changeval: changeval('*'),
+                            function: changeval('*'),
                           ),
                         ],
                       ),
@@ -171,12 +183,12 @@ class _SampleAppState extends State<SampleApp> {
                         children: [
                           CalcNumButton(
                             val: "0",
-                            changeval: changeval("0"),
+                            function: changeval("0"),
                           ),
                           CalcNumButton(
                             val: "Back",
-                            customcol: Colors.pink,
-                            changeval: backval('|'),
+                            customcol: const Color.fromARGB(255, 247, 147, 39),
+                            function: backval('|'),
                           ),
                         ],
                       ),
@@ -186,22 +198,22 @@ class _SampleAppState extends State<SampleApp> {
                         children: [
                           CalcNumButton(
                             val: ".",
-                            changeval: changeval("."),
+                            function: changeval("."),
                           ),
                           CalcNumButton(
                             val: "/",
                             customcol: Colors.cyan,
-                            changeval: changeval('/'),
+                            function: changeval('/'),
                           ),
                           CalcNumButton(
                             val: '=',
                             customcol: Colors.blueGrey,
-                            changeval: changeval('='),
+                            function: output('='),
                           ),
                           CalcNumButton(
                             val: 'AC',
                             customcol: Colors.brown,
-                            changeval: clearval('AC'),
+                            function: clearval('AC'),
                           )
                         ],
                       ),
@@ -217,12 +229,17 @@ class _SampleAppState extends State<SampleApp> {
   }
 }
 
+/// calculator button with optional color value but with
+///
+/// required
+/// + [val]  (Text on the button)
+/// + [function] (Funtion corresponding to that button)
 class CalcNumButton extends StatefulWidget {
-  final Function changeval;
+  final Function function;
   final String val;
   final Color? customcol;
   const CalcNumButton(
-      {super.key, required this.val, this.customcol, required this.changeval});
+      {super.key, required this.val, this.customcol, required this.function});
 
   @override
   State<CalcNumButton> createState() => _CalcNumButtonState();
@@ -237,14 +254,14 @@ class _CalcNumButtonState extends State<CalcNumButton> {
         child: ElevatedButton(
           onPressed: () {
             setState(() {
-              widget.changeval(widget.val);
-              print("button ${widget.val}");
+              widget.function(widget.val);
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                (widget.customcol == null) ? (Colors.black) : widget.customcol,
-            foregroundColor: Colors.amber,
+            backgroundColor: (widget.customcol == null)
+                ? (const Color.fromARGB(255, 205, 24, 24))
+                : widget.customcol,
+            foregroundColor: const Color.fromARGB(255, 0, 0, 0),
             textStyle: const TextStyle(fontSize: 20),
           ),
           child: Center(
