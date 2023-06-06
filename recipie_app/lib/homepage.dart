@@ -37,6 +37,16 @@ class _HomepageState extends State<Homepage> {
     } else {}
   }
 
+  void snapdata(http.Response snapshot2) {
+    final jsondata = json.decode(snapshot2.body);
+    for (var i = 0; i < jsondata['hits'].length; i++) {
+      val.add(jsondata['hits'][i]['recipe']['label']);
+      images.add(jsondata['hits'][i]['recipe']['image']);
+      links.add(jsondata['hits'][i]['recipe']['url']);
+    }
+  }
+
+  List<Widget> children = [];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -47,8 +57,8 @@ class _HomepageState extends State<Homepage> {
               image: NetworkImage(
                 'https://th.bing.com/th/id/OIP.PzKXUw9xlDt_LyGGVTgD3gHaLH?pid=ImgDet&rs=1',
               ))),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: ListView(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TextField(
             controller: textcontrol,
@@ -60,217 +70,82 @@ class _HomepageState extends State<Homepage> {
           ElevatedButton(
               onPressed: () {
                 setState(() {
+                  val = [];
+                  images = [];
+                  links = [];
+                  children = [];
                   displaytext = textcontrol.text;
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SecondRoute(
-                                displaytext: displaytext,
-                              )));
                 });
               },
-              child: const Text('search recipie'))
+              child: const Text('search recipie')),
+          FutureBuilder(
+              future: http.get(Uri.parse(
+                  'https://api.edamam.com/search?q=${(displaytext == "" ? "chicken" : displaytext)}&app_id=292ff540&app_key=389aa8ecd494756a7cef3337a9b4b9a4	&from=0&to=10&calories=591-722&health=alcohol-free')),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  var snapshot2 = snapshot.data!;
+                  snapdata(snapshot2);
+                  for (var index = 0; index < val.length; index = index + 2) {
+                    List<Widget> sideElements = [];
+                    for (var i = 0; i < 2; i++) {
+                      var samp = Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Stack(children: [
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(images[index + i])),
+                            Positioned(
+                              bottom: 0,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height / 8,
+                                decoration: BoxDecoration(
+                                    color: const Color.fromARGB(
+                                        255, 255, 255, 255),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    val[index + i],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 20,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (BuildContext context) {
+                                        return WebView(
+                                          javascriptMode:
+                                              JavascriptMode.unrestricted,
+                                          initialUrl: links[index + i],
+                                        );
+                                      }),
+                                    );
+                                  },
+                                  child: const Text('Get recipe')),
+                            ),
+                          ]),
+                        ),
+                      );
+                      sideElements.add(samp);
+                    }
+                    children.add(Row(
+                      children: sideElements,
+                    ));
+                  }
+                  return Column(
+                    children: children,
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              })
         ],
       ),
     ));
   }
-
-  void snapdata(http.Response snapshot2) {
-    final jsondata = json.decode(snapshot2.body);
-    for (var i = 0; i < jsondata['hits'].length; i++) {
-      val.add(jsondata['hits'][i]['recipe']['label']);
-      images.add(jsondata['hits'][i]['recipe']['image']);
-      links.add(jsondata['hits'][i]['recipe']['url']);
-    }
-  }
 }
-
-class SecondRoute extends StatefulWidget {
-  final String displaytext;
-  const SecondRoute({
-    super.key,
-    required this.displaytext,
-  });
-
-  @override
-  State<SecondRoute> createState() => _SecondRouteState();
-}
-
-class _SecondRouteState extends State<SecondRoute> {
-  var val = [];
-  var images = [];
-  var links = [];
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-          future: http.get(Uri.parse(
-              'https://api.edamam.com/search?q=${widget.displaytext}&app_id=292ff540&app_key=389aa8ecd494756a7cef3337a9b4b9a4	&from=0&to=10&calories=591-722&health=alcohol-free')),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              var snapshot2 = snapshot.data!;
-              snapdata(snapshot2);
-              return GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                itemCount: val.length,
-                itemBuilder: (_, index) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Stack(children: [
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(images[index])),
-                    Positioned(
-                      bottom: 20,
-                      child: Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            val[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 40,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                                return WebView(
-                                  javascriptMode: JavascriptMode.unrestricted,
-                                  initialUrl: links[index],
-                                );
-                              }),
-                            );
-                          },
-                          child: const Text('Get recipe')),
-                    ),
-                  ]),
-                ),
-              );
-            } else {
-              return Center(child: const CircularProgressIndicator());
-            }
-          }),
-    );
-  }
-
-  void snapdata(http.Response snapshot2) {
-    final jsondata = json.decode(snapshot2.body);
-    for (var i = 0; i < jsondata['hits'].length; i++) {
-      val.add(jsondata['hits'][i]['recipe']['label']);
-      images.add(jsondata['hits'][i]['recipe']['image']);
-      links.add(jsondata['hits'][i]['recipe']['url']);
-    }
-  }
-}
-// class _HomepageState extends State<Homepage> {
-//   TextEditingController textcontrol = TextEditingController();
-//   String displaytext = '';
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//       child: Container(
-//         decoration: const BoxDecoration(color: Colors.red),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: textcontrol,
-//               style: const TextStyle(color: Colors.white),
-//               decoration: const InputDecoration(
-//                   filled: true,
-//                   fillColor: Colors.blue,
-//                   hintText: "Enter the item"),
-//             ),
-//             ElevatedButton(
-//                 onPressed: () {
-//                   setState(() {
-//                     displaytext = textcontrol.text;
-//                     // print(displaytext);
-//                   });
-//                 },
-//                 child: const Text(
-//                   'send data',
-//                 )),
-//             Text(
-//               'displayed text is $displaytext',
-//               style: const TextStyle(
-//                   color: Color.fromARGB(255, 24, 0, 160), fontSize: 20),
-//             )
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-//https://github.com/flutter/flutter/issues/73109
-
-
-
-
-// ListView.builder(
-//                   itemCount: val.length,
-//                   itemBuilder: (context, itembuilder) {
-//                     return Padding(
-//                       padding: const EdgeInsets.all(8.0),
-//                       child: Container(
-//                         decoration: BoxDecoration(
-//                             color: Colors.blueGrey,
-//                             borderRadius: BorderRadius.circular(10)),
-//                         height: 200,
-//                         child: Stack(children: [
-//                           Row(
-//                             children: [
-//                               Image.network(images[itembuilder]),
-//                               Padding(
-//                                 padding:
-//                                     const EdgeInsets.symmetric(horizontal: 25),
-//                                 child: ElevatedButton(
-//                                     onPressed: () {
-//                                       Navigator.of(context).push(
-//                                         MaterialPageRoute(
-//                                             builder: (BuildContext context) {
-//                                           return WebView(
-//                                             javascriptMode:
-//                                                 JavascriptMode.unrestricted,
-//                                             onProgress: (value) {
-//                                               if (value == 100) {
-//                                                 setState(() {
-//                                                   isloading = false;
-//                                                 });
-//                                               }
-//                                             },
-//                                             initialUrl: links[itembuilder],
-//                                           );
-//                                         }),
-//                                       );
-//                                     },
-//                                     child: const Text('Get recipe')),
-//                               )
-//                             ],
-//                           ),
-//                           Positioned(
-//                             bottom: 20,
-//                             child: Container(
-//                               padding:
-//                                   const EdgeInsets.symmetric(horizontal: 10),
-//                               decoration: BoxDecoration(
-//                                   color:
-//                                       const Color.fromARGB(255, 255, 255, 255),
-//                                   borderRadius: BorderRadius.circular(10)),
-//                               child: Text(
-//                                 val[itembuilder],
-//                               ),
-//                             ),
-//                           ),
-//                         ]),
-//                       ),
-//                     );
-//                   });

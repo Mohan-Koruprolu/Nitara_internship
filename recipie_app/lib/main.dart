@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
             style: TextStyle(letterSpacing: 1.5, wordSpacing: 2),
           ),
         ),
-        body: Center(
+        body: const Center(
           child: Homepage(),
         ),
       ),
