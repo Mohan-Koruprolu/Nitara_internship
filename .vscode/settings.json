@@ -1,4 +1,9 @@
 {
     "editor.stickyScroll.enabled": false,
-    "dart.previewFlutterUiGuides": true
+    "dart.previewFlutterUiGuides": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none",
+    "cmake.sourceDirectory": "D:/nitarainternprojects/bmiapp/windows/runner"
 }
