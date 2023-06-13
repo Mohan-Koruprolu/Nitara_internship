@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:hive/hive.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -10,53 +11,38 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-class Centralvalue {
-  var val = [];
-  var images = [];
-  var links = [];
-}
-
 class _HomepageState extends State<Homepage> {
-  var val = [];
+  var val = <String>[];
   var images = [];
   var links = [];
-  Centralvalue common = Centralvalue();
   TextEditingController textcontrol = TextEditingController();
   String displaytext = '';
-  Future fetchJson() async {
-    final response = await http.get(Uri.parse(
-        'https://api.edamam.com/search?q=chicken&app_id=292ff540&app_key=389aa8ecd494756a7cef3337a9b4b9a4	&from=0&to=100&calories=591-722&health=alcohol-free'));
-    if (response.statusCode == 200) {
-      final jsondata = json.decode(response.body);
-      setState(() {
-        for (var i = 0; i < jsondata['hits'].length; i++) {
-          common.val.add(jsondata["hits"][i]['label']);
-          common.images.add(jsondata["hits"][i]['image']);
-        }
-      });
-    } else {}
-  }
 
   void snapdata(http.Response snapshot2) {
     final jsondata = json.decode(snapshot2.body);
     for (var i = 0; i < jsondata['hits'].length; i++) {
-      val.add(jsondata['hits'][i]['recipe']['label']);
+      val.add(jsondata['hits'][i]['recipe']['label'] as String);
       images.add(jsondata['hits'][i]['recipe']['image']);
       links.add(jsondata['hits'][i]['recipe']['url']);
     }
   }
 
   List<Widget> children = [];
+
   @override
   Widget build(BuildContext context) {
+    if (displaytext != '') {
+      dbstuff();
+    }
     return SafeArea(
         child: Container(
       decoration: const BoxDecoration(
-          image: DecorationImage(
-              fit: BoxFit.fill,
-              image: NetworkImage(
-                'https://th.bing.com/th/id/OIP.PzKXUw9xlDt_LyGGVTgD3gHaLH?pid=ImgDet&rs=1',
-              ))),
+          gradient: LinearGradient(colors: [
+        Color.fromARGB(227, 0, 0, 0),
+        Color.fromARGB(181, 32, 32, 32),
+        Color.fromARGB(195, 68, 68, 68),
+        Color.fromARGB(217, 79, 79, 79)
+      ])),
       child: ListView(
         // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -79,73 +65,107 @@ class _HomepageState extends State<Homepage> {
               },
               child: const Text('search recipie')),
           FutureBuilder(
-              future: http.get(Uri.parse(
-                  'https://api.edamam.com/search?q=${(displaytext == "" ? "chicken" : displaytext)}&app_id=292ff540&app_key=389aa8ecd494756a7cef3337a9b4b9a4	&from=0&to=10&calories=591-722&health=alcohol-free')),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  var snapshot2 = snapshot.data!;
-                  snapdata(snapshot2);
-                  for (var index = 0; index < val.length; index = index + 2) {
-                    List<Widget> sideElements = [];
-                    for (var i = 0; i < 2; i++) {
-                      var samp = Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Stack(children: [
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(images[index + i])),
-                            Positioned(
-                              bottom: 0,
+            future: http.get(Uri.parse(
+                'https://api.edamam.com/search?q=${(displaytext == "" ? "" : displaytext)}&app_id=292ff540&app_key=389aa8ecd494756a7cef3337a9b4b9a4	&from=0&to=10&calories=591-722&health=alcohol-free')),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                var snapshot2 = snapshot.data!;
+                snapdata(snapshot2);
+                for (var index = 0; index < val.length; index = index + 2) {
+                  List<Widget> sideElements = [];
+                  for (var i = 0; i < 2; i++) {
+                    var color2 = const Color.fromARGB(255, 255, 255, 255);
+                    var samp = Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Stack(children: [
+                          ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(images[index + i])),
+                          Positioned(
+                            bottom: 0,
+                            child: InkWell(
+                              onHover: (val) {
+                                setState(() {
+                                  color2 = (val) ? Colors.blue : Colors.green;
+                                });
+                              },
                               child: Container(
-                                height: MediaQuery.of(context).size.height / 8,
+                                height: MediaQuery.of(context).size.height / 12,
+                                width: MediaQuery.of(context).size.height / 9,
                                 decoration: BoxDecoration(
-                                    color: const Color.fromARGB(
-                                        255, 255, 255, 255),
+                                    color: color2,
                                     borderRadius: BorderRadius.circular(5)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    val[index + i],
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 6),
+                                        child: Text(
+                                          val[index + i],
+                                          style: TextStyle(
+                                              fontSize:
+                                                  (val[index + i].length > 15)
+                                                      ? 10
+                                                      : MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          30),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(builder:
+                                                  (BuildContext context) {
+                                                return WebView(
+                                                  javascriptMode: JavascriptMode
+                                                      .unrestricted,
+                                                  initialUrl: links[index + i],
+                                                );
+                                              }),
+                                            );
+                                          },
+                                          child: const Text(
+                                            'Get recipe',
+                                            style: TextStyle(
+                                                textBaseline:
+                                                    TextBaseline.alphabetic),
+                                          )),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            Positioned(
-                              bottom: 20,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (BuildContext context) {
-                                        return WebView(
-                                          javascriptMode:
-                                              JavascriptMode.unrestricted,
-                                          initialUrl: links[index + i],
-                                        );
-                                      }),
-                                    );
-                                  },
-                                  child: const Text('Get recipe')),
-                            ),
-                          ]),
-                        ),
-                      );
-                      sideElements.add(samp);
-                    }
-                    children.add(Row(
-                      children: sideElements,
-                    ));
+                          ),
+                        ]),
+                      ),
+                    );
+                    sideElements.add(samp);
                   }
-                  return Column(
-                    children: children,
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
+                  children.add(Row(
+                    children: sideElements,
+                  ));
                 }
-              })
+                return Column(
+                  children: children,
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          )
         ],
       ),
     ));
+  }
+
+  void dbstuff() async {
+    var box = await Hive.openBox('RecentWord');
+    // box.put(TimeOfDay.now() as String, displaytext);
+    print(box);
   }
 }
